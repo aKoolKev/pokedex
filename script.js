@@ -193,7 +193,7 @@ window.onload = function (){
             fetchData();
         }
     });
-    searchBarEl.addEventListener("click", function(e) {
+    searchBarEl.addEventListener("focus", function(e) {
         searchBarEl.value="";
     });
 
