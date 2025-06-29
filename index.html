@@ -8,15 +8,37 @@
     <link rel="stylesheet"></link>
   </head>
   
-  <body>
-    <h1>Pokédex</h1>
-    <p>Learning how to use FETCH in JS using the Pokemon API</p>
+  <body style="text-align: center;">
+    <h1 style="color: #FF0000;">Pokédex</h1>
+    <p>Learning how to use FETCH in JS using the <a href="https://pokeapi.co/" target="_blank"> Pokémon API. </a> </p> 
 
-    <input type="text" placeholder="Enter Pokémon name..." id="pokemonName">
-    <button onclick="fetchData()">Fetch Pokemon</button>
-    <br>
+    <input type="text" placeholder="Enter Pokémon name..." id="searchBar">
+    <!-- <button id="fetchBtn" onclick="fetchData()">Fetch Pokemon</button>
+    <br> -->
 
-    <img src="" alt="Pokemon sprite" id="pokemonSprite" style="display: none;">
+    <hr> 
+
+    <!-- Display pokemon name -->
+    <h2 id="pokemonName" style="display:none;">Pokemon Name</h2>
+
+    <!-- Display front & back side of sprite -->
+    <img src="" alt="Pokemon sprite front side" id="pokemonSpriteFront" style="display: none;">
+    <img src="" alt="Pokemon sprite back side" id="pokemonSpriteBack" style="display: none;">
+    
+
+
+    <!-- DISPLAY PKM STATS: -->
+    
+    <!-- TYPE -->
+    <p> <b>Type:</b> <span id="pkmType" style="display:none;"></span> </p>
+
+    <div>
+      <p> <b>Evolution(s):</b>  </p>
+      <div id="pkmEvolution">
+
+      </div>
+    </div>
+
 
     <script src="script.js"></script>
   </body>
