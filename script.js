@@ -209,9 +209,6 @@ async function displayEvolutionChain2(data)
 
         //call other function to handle collecting all evolution names
         await getEvolutionChain2(data, names);
-        names.forEach(element => {
-            alert(element);
-        });
 
         //display each sprite
         for (const name of names)
