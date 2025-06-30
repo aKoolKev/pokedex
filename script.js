@@ -29,8 +29,18 @@
 
 
 //EX3: fetching resources using ASYNC and AWAIT
+
+
 async function fetchData(){
+    
+    if(isFetching) return; //prevent "enter" key spam
+    fetchBtnEl.disabled=true; //disable button to prevent spam
+
+    isFetching = true; //toggle
+
+    
     try{
+       
 
         //get user input
         const pokemonName = document.getElementById("searchBar").value.toLowerCase();
@@ -60,11 +70,16 @@ async function fetchData(){
         displayPKM_TYPE(data);
 
         // *** EVOLUTION CHAIN ***
-        displayEvolutionChain(data);
+        await displayEvolutionChain2(data);
     }
     catch(error){
         alert("Please check pokemon spelling or is this even a pokemon?")
         console.error(error);
+    }
+    finally
+    {
+        isFetching = false;
+        fetchBtnEl.disabled = false; //re-enable button when done
     }
 }
 
@@ -73,6 +88,7 @@ async function fetchPkmData(name)
 {
     try 
     {
+        name = name === "wormadam" ? "wormadam-plant" : name; //wormadam is not in the "/pokemon url". The name is "wormadam-plant" for some reason...
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
         if(!response.ok)
             throw new Error("fetchPKM(): Could not fetch resource!");
@@ -182,18 +198,88 @@ function cap1stLetter(str)
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-window.onload = function (){
-    // const fetchBtnEl = document.getElementById("fetchBtn");
-    // fetchBtnEl.addEventListener("click", fetchData);
+//function that displays all the evolution of a pokemon (updated function and in use as of 6/29/25)
+async function displayEvolutionChain2(data)
+{
+    try
+    {
+        const names = [];
+        const pkmEvolutionEl = document.getElementById("pkmEvolution");
+        pkmEvolutionEl.replaceChildren();
 
-    const searchBarEl = document.getElementById("searchBar");
+        //call other function to handle collecting all evolution names
+        await getEvolutionChain2(data, names);
+        names.forEach(element => {
+            alert(element);
+        });
+
+        //display each sprite
+        for (const name of names)
+        {
+            const pkmData = await fetchPkmData(name); 
+            const imgEl = document.createElement("img");
+            imgEl.src = pkmData.sprites.front_default;
+            pkmEvolutionEl.appendChild(imgEl);
+        }
+    }
+    catch (error) {console.error(error);}
+
+}
+
+//function that collects all the name of the evolutions of a pokemon (updated function and in use as of 6/29/25)
+async function getEvolutionChain2(data, names) //data is from "pokemon/" url
+{
+    //grab data from "pokemon-species/ url"
+    const species_resp = await fetch(data.species.url);
+    if(!species_resp.ok) throw new Error("getEvolutionChain2(): Could not get pokemon-species resource!");
+    const pokemon_species_data = await species_resp.json();
+    
+    //grab data from "evolution-chain/ url"
+    const evolution_chain_resp = await fetch(pokemon_species_data.evolution_chain.url);
+    if(!evolution_chain_resp.ok) throw new Error("getEvolutionChain2(): Could not get evolution-chain resource!");
+    const evolution_chain_data = await evolution_chain_resp.json();
+
+    names.push(evolution_chain_data.chain.species.name);
+    let arr = evolution_chain_data.chain.evolves_to;
+    getEvolutionChainHelper(arr,names);
+}
+
+//helper function to getEvolutionChain2 that collects all the evolution names (updated function and in use as of 6/29/25)
+function getEvolutionChainHelper(arr,names)
+{
+    //base case: no next evolution stage
+    if (arr.length === 0) return;
+
+    //print out all evolutions at this stage
+    for(let i=0; i<arr.length; i++)
+    {
+        names.push(arr[i].species.name);
+        getEvolutionChainHelper(arr[i].evolves_to, names); //recursively collect each branch
+    }   
+}
+
+
+//toggling to prevent "enter" key spams
+let isFetching = false;
+
+//globals vars
+const fetchBtnEl = document.getElementById("fetchBtn");
+const searchBarEl = document.getElementById("searchBar");
+
+window.onload = function (){
+    //button to submit the search bar request
+    fetchBtnEl.addEventListener("click", fetchData);
+
+    //enter button submit the search bar request
     searchBarEl.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !isFetching){
             e.preventDefault();
             fetchData();
         }
     });
-    searchBarEl.addEventListener("focus", function(e) {
+
+    //clear search bar on click
+    searchBarEl.addEventListener("focus", function() {
         searchBarEl.value="";
     });
 
