@@ -40,8 +40,6 @@ async function fetchData(){
 
     
     try{
-       
-
         //get user input
         const pokemonName = document.getElementById("searchBar").value.toLowerCase();
     
@@ -67,10 +65,15 @@ async function fetchData(){
         // *** DISPLAY STATS ***
         
         // *** PKM TYPE ***
-        displayPKM_TYPE(data);
+        const typeArr = displayPKM_TYPE(data);
 
         // *** EVOLUTION CHAIN ***
         await displayEvolutionChain2(data);
+
+        getStength(typeArr);
+
+        //show field after a valid response
+        document.getElementsByClassName("resultsContainer")[0].classList.remove("hidden");
     }
     catch(error){
         alert("Please check pokemon spelling or is this even a pokemon?")
@@ -101,9 +104,11 @@ async function fetchPkmData(name)
     }
 }
 
-//Display a pokemon's type
+//Display a pokemon's type as well as returning an array of all of it's type
 function displayPKM_TYPE (data) 
 {
+    const typeArr = [];
+
     const pkmTypeEl = document.getElementById("pkmType");
     //clear previous types
     pkmTypeEl.textContent = "";
@@ -111,13 +116,16 @@ function displayPKM_TYPE (data)
     //list the types
     for (let i=0; i<data.types.length; i++)
     {
-        pkmTypeEl.textContent += cap1stLetter(data.types[i].type.name);
+        const type = cap1stLetter(data.types[i].type.name);
+        typeArr.push(type);
+        pkmTypeEl.textContent += type;
         pkmTypeEl.style.display = "inline-block";
 
         //Handle correct commas
         if (i<data.types.length-1)
             pkmTypeEl.textContent += ', '; 
     }
+    return typeArr;
 }
 
 //Display a pokemon's name
@@ -216,6 +224,7 @@ async function displayEvolutionChain2(data)
             const pkmData = await fetchPkmData(name); 
             const imgEl = document.createElement("img");
             imgEl.src = pkmData.sprites.front_default;
+            imgEl.classList = "w-xs";
             pkmEvolutionEl.appendChild(imgEl);
         }
     }
@@ -255,6 +264,31 @@ function getEvolutionChainHelper(arr,names)
     }   
 }
 
+function getWeakness(){}
+
+function getStength(typeArr){
+    const pkmStrengthEl = document.getElementById("pkmStrength");
+    pkmStrengthEl.replaceChildren(); //clear old list 
+
+    for(let i=0; i<typeArr.length; i++)
+    {
+        const currType = typeArr[i];
+        let message = '<' + currType + "> → ";
+
+        const defendingType = typeChart[currType];
+        
+
+        for(val in defendingType){
+            if (defendingType[val]===2){
+                message += '[' + val + '] ';
+            }
+        }
+        const pEl = document.createElement('p');
+        pEl.innerText = message;
+        pEl.className="text-xl";
+        pkmStrengthEl.appendChild(pEl);
+    }
+}
 
 //toggling to prevent "enter" key spams
 let isFetching = false;
@@ -262,6 +296,168 @@ let isFetching = false;
 //globals vars
 const fetchBtnEl = document.getElementById("fetchBtn");
 const searchBarEl = document.getElementById("searchBar");
+
+//Pokemon type advantage table (attacker -> defender -> multiplier)
+const typeChart = {
+    "Normal" : {
+        "Rock":0.5,
+        "Ghost":0,
+        "Steel":0.5
+    },
+    "Fire" : {
+        "Fire":0.5,
+        "Water":0.5,
+        "Grass":2,
+        "Ice":2,
+        "Bug":2,
+        "Rock":0.5,
+        "Dragon":0.5,
+        "Steel":2
+    },
+    "Water" : {
+        "Fire":2,
+        "Water":0.5,
+        "Grass":0.5,
+        "Ground":2,
+        "Rock":2,
+        "Dragon":0.5
+    },
+    "Electric" : {
+        "Water":2,
+        "Electric":0.5,
+        "Grass":0.5,
+        "Ground":0,
+        "Flying":2,
+        "Dragon":0.5
+    },
+    "Grass" : {
+        "Fire":0.5,
+        "Water":2,
+        "Grass":0.5,
+        "Poison":0.5,
+        "Ground":2,
+        "Flying":0.5,
+        "Bug":0.5,
+        "Rock":2,
+        "Dragon":0.5,
+        "Steel":0.5
+    },
+    "Ice" : {
+        "Fire":0.5,
+        "Water":0.5,
+        "Grass":2,
+        "Ice":0.5,
+        "Ground":2,
+        "Flying":2,
+        "Dragon":2,
+        "Steel":0.5
+    },
+    "Fighting" : {
+        "Normal":2,
+        "Ice":2,
+        "Poison":0.5,
+        "Flying":0.5,
+        "Psychic":0.5,
+        "Bug":0.5,
+        "Rock":2,
+        "Ghost":0,
+        "Dark":2,
+        "Steel":2,
+        "Fairy":0.5
+    },
+    "Poison" : {
+        "Grass":2,
+        "Poison":0.5,
+        "Ground":0.5,
+        "Rock":0.5,
+        "Ghost":0.5,
+        "Steel":0,
+        "Fairy":2
+    },
+    "Ground" : {
+        "Fire":2,
+        "Electric":2,
+        "Grass":0.5,
+        "Poison":2,
+        "Flying":0,
+        "Bug":0.5,
+        "Rock":2,
+        "Steel":2
+    },
+    "Flying" : {
+        "Electric":0.5,
+        "Grass":2,
+        "Fighting":2,
+        "Bug":2,
+        "Rock":0.5,
+        "Steel":0.5
+    },
+    "Psychic" : {
+        "Fighting":2,
+        "Poison":2,
+        "Psychic":0.5,
+        "Dark":0,
+        "Steel":0.5
+    },
+    "Bug" : {
+        "Fire":0.5,
+        "Grass":2,
+        "Fighting":0.5,
+        "Poison":0.5,
+        "Flying":0.5,
+        "Psychic":2,
+        "Ghost":0.5,
+        "Dark":2,
+        "Steel":0.5,
+        "Fairy":0.5
+    },
+    "Rock" : {
+        "Fire":2,
+        "Ice":2, 
+        "Fighting":0.5,
+        "Ground":0.5,
+        "Flying":2,
+        "Bug":2,
+        "Steel":0.5
+    },
+    "Ghost":{
+        "Normal":0,
+        "Psychic":2,
+        "Ghost":2,
+        "Steel":0.5
+    },
+    "Dragon":{
+        "Dragon":2,
+        "Steel":0.5,
+        "Fairy":0
+    },
+    "Dark":{
+        "Fighting":0.5,
+        "Psychic":2,
+        "Ghost":2,
+        "Dark":0.5,
+        "Fairy":0.5
+    },
+    "Steel":{
+        "Fire":0.5,
+        "Water":0.5,
+        "Electric":0.5,
+        "Ice":2,
+        "Rock":2,
+        "Steel":0.5,
+        "Fairy":2
+    },
+    "Fairy":{
+        "Fire":0.5,
+        "Fighting":2,
+        "Poison":0.5,
+        "Dragon":2,
+        "Dark":2,
+        "Steel":0.5
+    }
+}
+
+
 
 window.onload = function (){
     //button to submit the search bar request

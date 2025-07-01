@@ -1,45 +1,101 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokédex</title>
-    <link rel="stylesheet"></link>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> 
+    <!-- Flowbite Tailwind Component Library CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+    <style>
+      :root {
+        --black: #1e1e24;
+        --red:#FF0000;
+        --white:#fff8f0;
+      }
+    </style>
   </head>
   
-  <body style="text-align: center;">
-    <h1 style="color: #FF0000;">Pokédex</h1>
-    <p>Learning how to use FETCH in JS using the <a href="https://pokeapi.co/" target="_blank"> Pokémon API. </a> </p> 
+  <body class="font-[Roboto] bg-[var(--black)]">
+   
 
-    <input type="text" placeholder="Enter Pokémon name..." id="searchBar">
-    <button id="fetchBtn">Fetch Pokemon</button>
-    <br>
+    <!-- Main container -->
+    <div class="mainContainer min-h-screen w-full flex flex-col items-center">
 
-    <hr> 
+      <!-- TITLE -->
+      <h1 class="text-center text-[var(--red)] font-bold text-5xl uppercase p-3 m-3 my-10 animate-bounce"><span class="text-[var(--white)]">Kevin's</span> Pokédex</h1>
 
-    <!-- Display pokemon name -->
-    <h2 id="pokemonName" style="display:none;">Pokemon Name</h2>
-
-    <!-- Display front & back side of sprite -->
-    <img src="" alt="Pokemon sprite front side" id="pokemonSpriteFront" style="display: none;">
-    <img src="" alt="Pokemon sprite back side" id="pokemonSpriteBack" style="display: none;">
-    
-
-
-    <!-- DISPLAY PKM STATS: -->
-    
-    <!-- TYPE -->
-    <p> <b>Type:</b> <span id="pkmType" style="display:none;"></span> </p>
-
-    <div>
-      <p> <b>Evolution(s):</b>  </p>
-      <div id="pkmEvolution">
+      <!-- WELCOME TEXT -->
+      <div class="w-3/4 bg-[var(--white)] rounded-lg text-sm p-3 opacity-75 md:text-xl">
+        <p class="text-center">I'm learning how to use FETCH in JS by using the <a class="text-[#92140c] underline" href="https://pokeapi.co/" target="_blank"> Pokémon API</a> and slowly adding more features to the app. <br><br> I hope enjoy! - KD </a> </p> 
       </div>
-    </div>
+      
+      <!-- SEARCH BAR -->
+      <form class="w-5/6 md:w-1/2 m-5">   
+        <label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+        <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                </svg>
+            </div>
+            <input type="search" id="searchBar" class="block w-full p-4 ps-10 text-sm md:text-xl text-[var(--white)] border border-[var(--white)] rounded-lg bg-[var(--black)] focus:ring-[var(--red)] focus:border-var(--red)" placeholder="Enter Pokémon name..." required />
+            <button id="fetchBtn" type="submit" class="text-[var(--white)] absolute end-2.5 bottom-2.5 bg-[var(--red)] hover:bg-[#9C2B24] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm md:text-lg px-4 py-2">Search</button>
+        </div>
+      </form>
 
+      <div class="resultsContainer w-5/6 md:w-3/4 bg-[var(--white)] flex flex-col items-center rounded-lg my-5 md:p-10 text-center hidden">
 
+        <!-- Display pokemon name -->
+        <h2 id="pokemonName" style="display:none;" class="font-bold border border-black text-4xl text-center p-3">Pokemon Name</h2>
+
+        <!-- Display front & back side of sprite -->
+        <div class="border border-black flex flex-row justify-evenly w-full">
+          <img src="" alt="Pokemon sprite front side" id="pokemonSpriteFront" style="display: none;" class="w-3/4 md:w-xs">
+          <img src="" alt="Pokemon sprite back side" id="pokemonSpriteBack" style="display: none;" class="w-3/4 md:w-xs">
+        </div>
+
+          <!-- TYPE -->
+        <div class="w-1/2 border border-black">
+          <p class="font-bold text-2xl p-3">Type:</p>
+          <span id="pkmType" style="display:none;" class="text-xl p-2"></span>
+        </div>
+
+        <!-- DISPLAY PKM EVOLUTION CHAIN -->
+        <div class="w-full border border-black">
+          <p class="font-bold text-2xl p-3"> Evolution(s): </p>
+          <div id="pkmEvolution" class="flex flex-row justify-evenly">
+            <!-- Filled dynamically -->
+          </div>
+        </div>
+
+        <!-- DISPLAY PKM STENGTH -->
+        <div class="w-full py-2 md:w-1/2 border border-black md:p-3">
+          <p class="font-bold text-2xl">Strength(s):</p>
+          <div id="pkmStrength">
+            <!-- Dynamically populate here -->
+          </div>
+        </div>
+
+        <!-- DISPLAY PKM WEAKNESS -->
+        <div class="w-full py-2 md:w-1/2 border border-black md:p-3">
+          <p class="font-bold text-2xl">Weakness(s):</p>
+          <div id="pkmWeakness">
+            <!-- Dynamically populate here -->
+          </div>
+        </div>
+
+      </div> <!-- Result Container  -->
+    
+    </div> <!-- Main Container  -->
+
+    <!-- Handle loading page and api fetches -->
     <script src="script.js"></script>
+
+    <!-- Flowbite Tailwind Component Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
   </body>
 
 </html>
